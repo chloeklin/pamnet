@@ -12,7 +12,7 @@
 
 cd /scratch/um09/hl4138
 
-module load python3/3.7.4
+module load python3/3.7.4 cuda/10.1
 module list
 
 source pamnet-venv/bin/activate
