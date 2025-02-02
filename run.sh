@@ -5,7 +5,7 @@
 #PBS -l ncpus=48
 #PBS -l ngpus=4
 #PBS -l mem=128GB
-#PBS -l walltime=00:20:00
+#PBS -l walltime=48:00:00
 #PBS -l storage=scratch/um09
 #PBS -l jobfs=100GB
 #PBS -v PYTHONPATH=/scratch/um09/hl4138/llm-venv/lib/python3.10/site-packages
