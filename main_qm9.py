@@ -98,7 +98,12 @@ def main():
     ema = EMA(model, decay=0.999)
 
     print("Start training!")
+
     best_val_loss = None
+    patience = 20  # Added patience parameter
+    epochs_since_improvement = 0  # Tracks epochs without validation improvement
+
+
     for epoch in range(args.epochs):
         loss_all = 0
         step = 0
@@ -130,9 +135,19 @@ def main():
             test_loss = test(model, test_loader, ema, device)
             best_val_loss = val_loss
             torch.save(model.state_dict(), osp.join(save_folder, "best_model.h5"))
+            epochs_since_improvement = 0  # Reset patience counter
+        else:
+            epochs_since_improvement += 1  # Increment patience counter
+
 
         print('Epoch: {:03d}, Train MAE: {:.7f}, Val MAE: {:.7f}, '
             'Test MAE: {:.7f}'.format(epoch+1, loss, val_loss, test_loss))
+        
+        # Early stopping condition
+        if epochs_since_improvement >= patience:
+            print(f"Early stopping triggered after {epoch+1} epochs. Best Validation MAE: {best_val_loss}")
+            break
+        
     print('Best Validation MAE:', best_val_loss)
     print('Testing MAE:', test_loss)
 
