@@ -14,6 +14,9 @@ from models import PAMNet, PAMNet_s, Config
 from utils import EMA
 from datasets import QM9
 
+import pandas as pd
+
+
 
 def set_seed(seed):
     torch.backends.cudnn.deterministic = True
@@ -132,6 +135,35 @@ def main():
             'Test MAE: {:.7f}'.format(epoch+1, loss, val_loss, test_loss))
     print('Best Validation MAE:', best_val_loss)
     print('Testing MAE:', test_loss)
+
+    
+    # Define the target names
+    targets = ["mu", "alpha", "HOMO", "LUMO", "R2", "ZPVE", "U0", "U", "H", "G", "Cv", "gap"]
+    target_name = targets[args.target]  # Get the corresponding target name
+
+    # Define the file name
+    csv_filename = "qm9_pamnet.csv"
+
+    # Check if the file exists
+    if osp.exists(csv_filename):
+        # Load the existing CSV
+        df = pd.read_csv(csv_filename)
+    else:
+        # Create a new DataFrame with the specified columns
+        df = pd.DataFrame(columns=["mu", "alpha", "HOMO", "LUMO", "R2", "ZPVE", "U0", "U", "H", "G", "Cv", "gap", 
+                                "Model", "Mean_Std_MAE", "Mean_Std_logMAE"])
+
+    # Update the test loss for the corresponding target
+    df.loc[0, target_name] = test_loss  # Store the test loss in the correct column
+
+    # Ensure the "Model" column stores the model name
+    df.loc[0, "Model"] = args.model
+
+    # Save the updated DataFrame back to CSV
+    df.to_csv(csv_filename, index=False)
+
+    print(f"Test loss for {target_name} saved to {csv_filename}.")
+
 
 
 if __name__ == "__main__":
